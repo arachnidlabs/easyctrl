@@ -21,19 +21,61 @@ void Easyctrl_Class::writeManifest()  {
 }
 
 template<>
-const char Monitored<int>::type_name[] PROGMEM = "int";
+void Monitored<int>::parse(const char *data) {
+    this->value = strtol(data, NULL, 0);
+}
 
 template<>
-const char Monitored<unsigned int>::type_name[] PROGMEM = "uint";
+void Monitored<int>::printTypeName(Stream &stream) {
+	stream.print(F("int"));
+}
 
 template<>
-const char Monitored<long>::type_name[] PROGMEM = "long";
+void Monitored<unsigned int>::parse(const char *data) {
+    this->value = strtoul(data, NULL, 0);
+}
 
 template<>
-const char Monitored<unsigned long>::type_name[] PROGMEM = "ulong";
+void Monitored<unsigned int>::printTypeName(Stream &stream) {
+	stream.print(F("uint"));
+}
 
 template<>
-const char Monitored<float>::type_name[] PROGMEM = "float";
+void Monitored<long>::parse(const char *data) {
+    this->value = strtol(data, NULL, 0);
+}
 
 template<>
-const char Monitored<double>::type_name[] PROGMEM = "double";
+void Monitored<long>::printTypeName(Stream &stream) {
+	stream.print(F("long"));
+}
+
+template<>
+void Monitored<unsigned long>::parse(const char *data) {
+    this->value = strtoul(data, NULL, 0);
+}
+
+template<>
+void Monitored<unsigned long>::printTypeName(Stream &stream) {
+	stream.print(F("ulong"));
+}
+
+template<>
+void Monitored<float>::parse(const char *data) {
+    this->value = strtod(data, NULL);
+}
+
+template<>
+void Monitored<float>::printTypeName(Stream &stream) {
+	stream.print(F("float"));
+}
+
+template<>
+void Monitored<double>::parse(const char *data) {
+    this->value = strtod(data, NULL);
+}
+
+template<>
+void Monitored<double>::printTypeName(Stream &stream) {
+	stream.print(F("double"));
+}

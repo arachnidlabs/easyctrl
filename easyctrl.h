@@ -15,10 +15,22 @@ protected:
     bool dirty;
     bool writeable;
 
+    void describe(Stream &stream) {
+        stream.print(F(".field "));
+        stream.print(this->name);
+        stream.print(F(" "));
+        this->printTypeName(stream);
+        if(this->writeable) {
+            stream.println(F(" rw"));
+        } else {
+            stream.println(F(" ro"));
+        }
+    }
+
     void init(const char *name, bool writeable);
     virtual void parse(const char *data) = 0;
     virtual void format(Stream &stream) = 0;
-    virtual void describe(Stream &stream) = 0;
+    virtual void printTypeName(Stream &stream) = 0;
 
     void read(const char *data) {
         this->parse(data);
@@ -119,22 +131,10 @@ template<class T>
 class Monitored : public MonitoredBase {
 private:
     T value;
-    static const char type_name[] PROGMEM;
 protected:
     virtual void format(Stream &stream);
     virtual void parse(const char *data);
-
-    virtual void describe(Stream &stream) {
-        stream.print(F(".field "));
-        stream.print(this->name);
-        stream.print(F(" "));
-        stream.print(reinterpret_cast<const __FlashStringHelper *>(this->type_name));
-        if(this->writeable) {
-            stream.println(F(" rw"));
-        } else {
-            stream.println(F(" ro"));
-        }
-    }
+    virtual void printTypeName(Stream &stream);
 public:
     Monitored(const char *name, T value) {
         this->value = value;
@@ -169,38 +169,8 @@ public:
 
 // Formatter for any type supported by stream.print
 template<class T>
-inline void Monitored<T>::format(Stream &stream) {
+void Monitored<T>::format(Stream &stream) {
     stream.print(this->value);
-}
-
-template<>
-inline void Monitored<int>::parse(const char *data) {
-    this->value = strtol(data, NULL, 0);
-}
-
-template<>
-inline void Monitored<unsigned int>::parse(const char *data) {
-    this->value = strtoul(data, NULL, 0);
-}
-
-template<>
-inline void Monitored<long>::parse(const char *data) {
-    this->value = strtol(data, NULL, 0);
-}
-
-template<>
-inline void Monitored<unsigned long>::parse(const char *data) {
-    this->value = strtoul(data, NULL, 0);
-}
-
-template<>
-inline void Monitored<float>::parse(const char *data) {
-    this->value = strtod(data, NULL);
-}
-
-template<>
-inline void Monitored<double>::parse(const char *data) {
-    this->value = strtod(data, NULL);
 }
 
 #endif
