@@ -34,11 +34,16 @@ This declares an 80 character long buffer. No dynamic memory allocation is requi
     char foo = buf[1];
     strcpy(buf, "Blah");
 
-And even a few that you can't:
+Unlike primitive variables, MonitoredBuffer can't always tell when you've modified its contents. If you've modified it directly, such as in the examples above, you'll need to tell it:
+
+    buf.changed();
+
+MonitoredBuffer also supports a few convenience methods for copying into it:
 
     buf = "Foo"; // Makes a copy of foo into buf
     buf = another_string; // As above, copies the value in another_string
     buf = F("I'm in progmem!"); // Copies a value out of flash into the buffer
+
 
 ### Initialization & Execution
 
