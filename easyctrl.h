@@ -22,6 +22,7 @@ protected:
 
     void read(const char *data) {
         this->parse(data);
+        this->dirty = false;
     }
 
     void write(Stream &stream) {
