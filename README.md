@@ -5,6 +5,8 @@ Makes controlling and monitoring an Arduino sketch from a computer trivial!
 
 ## API
 
+### Variables
+
 Using easyctrl, you define monitored variables like this:
 
     Monitored<int> foo("foo");
@@ -19,6 +21,26 @@ Once you've declared a monitored variable, you can use it just like you would a 
 
     foo = analogRead(A1); // Update foo
     digitalWrite(13, foo > 42); // Read foo
+
+Currently, the following numeric types are supported: `int`, `unsigned int`, `long`, `unsigned long`, and `float`.
+
+Basic support for fixed-size buffers is provided in the form of `MonitoredBuffer`. You define one like this:
+
+    MonitoredBuffer<80> buf("buf");
+
+This declares an 80 character long buffer. No dynamic memory allocation is required or used. Just like primitives, you can perform most ordinary operations on the buffer as if it were a char[]:
+
+    buf[0] = 'X';
+    char foo = buf[1];
+    strcpy(buf, "Blah");
+
+And even a few that you can't:
+
+    buf = "Foo"; // Makes a copy of foo into buf
+    buf = another_string; // As above, copies the value in another_string
+    buf = F("I'm in progmem!"); // Copies a value out of flash into the buffer
+
+### Initialization & Execution
 
 To initialize easyctrl, call `Easyctrl.begin()` in your setup function, like this:
 
@@ -55,11 +77,15 @@ After that, any changes to variables will be output the next time `Easyctrl.upda
 
     .value foo 42
 
+String values are supported with minimal escaping. \r, \n and \ are all escaped on output and unescaped on input.
+
 Easyctrl currently accepts only one command, `.set`, which sets a variable. Its use is straightforward:
 
     .set foo 123
 
 No response is returned to a valid `.set` command.
+
+When setting a string value, the remainder of the command up to the trailing newline is taken as the new value for the buffer.
 
 ## Examples
 
