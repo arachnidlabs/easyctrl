@@ -154,8 +154,8 @@ public:
     }
 
     Monitored<T>& operator=(T value) {
+        this->dirty = (this->value != value);
         this->value = value;
-        this->dirty = true;
     }
 
     operator T() {
