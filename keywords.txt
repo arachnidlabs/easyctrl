@@ -1,0 +1,3 @@
+Easyctrl	KEYWORD1
+Monitored	KEYWORD1
+update		KEYWORD2
