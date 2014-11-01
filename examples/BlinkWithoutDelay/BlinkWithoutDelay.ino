@@ -21,7 +21,7 @@ void setup() {
 	Serial.begin(115200);
 
     // Initialize easyctrl, communicating over the serial port.
-	Easyctrl.begin("blink", Serial);
+	Easyctrl.begin("BlinkWithoutDelay", Serial);
 
     // Set the LED pin as an output
     pinMode(13, OUTPUT);
