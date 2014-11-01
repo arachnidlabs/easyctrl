@@ -167,4 +167,40 @@ public:
     }
 };
 
+// Formatter for any type supported by stream.print
+template<class T>
+inline void Monitored<T>::format(Stream &stream) {
+    stream.print(this->value);
+}
+
+template<>
+inline void Monitored<int>::parse(const char *data) {
+    this->value = strtol(data, NULL, 0);
+}
+
+template<>
+inline void Monitored<unsigned int>::parse(const char *data) {
+    this->value = strtoul(data, NULL, 0);
+}
+
+template<>
+inline void Monitored<long>::parse(const char *data) {
+    this->value = strtol(data, NULL, 0);
+}
+
+template<>
+inline void Monitored<unsigned long>::parse(const char *data) {
+    this->value = strtoul(data, NULL, 0);
+}
+
+template<>
+inline void Monitored<float>::parse(const char *data) {
+    this->value = strtod(data, NULL);
+}
+
+template<>
+inline void Monitored<double>::parse(const char *data) {
+    this->value = strtod(data, NULL);
+}
+
 #endif
