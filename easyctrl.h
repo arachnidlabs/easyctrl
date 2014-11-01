@@ -47,6 +47,11 @@ protected:
             this->dirty = false;
         }
     }
+
+public:
+    void changed() {
+        this->dirty = true;
+    }
 };
 
 class Easyctrl_Class {
@@ -156,6 +161,7 @@ public:
     Monitored<T>& operator=(T value) {
         this->dirty = (this->value != value);
         this->value = value;
+        return *this;
     }
 
     operator T() {
@@ -164,6 +170,108 @@ public:
 
     const char *getName() {
         return this->name;
+    }
+};
+
+template<int size>
+class MonitoredBuffer : public MonitoredBase {
+private:
+    char buf[size];
+protected:
+    virtual void format(Stream &stream) {
+        for(char *c = buf; *c != '\0' && c - buf < size; c++) {
+            switch(*c) {
+            case '\n':
+                stream.print(F("\\n"));
+                break;
+            case '\r':
+                stream.print(F("\\r"));
+                break;
+            case '\\':
+                stream.print(F("\\\\"));
+                break;
+            default:
+                if(*c < 0) {
+                    stream.print(F("\\x"));
+                    stream.print((unsigned char)*c, HEX);
+                } else {
+                    stream.print(*c);
+                }
+                break;
+            }
+        }
+    }
+
+    virtual void parse(const char *data) {
+        int idx = 0;
+        for(const char *c = data; *c != '\0' && *c != '\n' && c - data < size - 1; c++) {
+            if(*c == '\\') {
+                c++;
+                switch(*c) {
+                case 'n':
+                    buf[idx++] = '\n';
+                    break;
+                case 'r':
+                    buf[idx++] = '\r';
+                    break;
+                case '\\':
+                    buf[idx++] = '\\';
+                    break;
+                case 'x':
+                    buf[idx++] = strtol((const char[]){c[1], c[2], '\0'}, NULL, 16);
+                    c += 2;
+                    break;
+                }
+            } else {
+                buf[idx++] = *c;
+            }
+        }
+        buf[idx] = '\0';
+    }
+
+    virtual void printTypeName(Stream &stream) {
+        stream.print(F("char["));
+        stream.print(size);
+        stream.print(F("]"));
+    }
+
+public:
+    MonitoredBuffer(const char *name) {
+        this->dirty = false;
+        init(name, true);
+    }
+
+    MonitoredBuffer(const char *name, bool writeable) {
+        this->dirty = false;
+        init(name, writeable);
+    }
+
+    MonitoredBuffer& operator=(const MonitoredBuffer &value) {
+        strncpy(this->buf, value.buf, size);
+        this->dirty = true;
+    }
+
+    MonitoredBuffer& operator=(const char *value) {
+        strncpy(this->buf, value, size);
+        this->dirty = true;
+    }
+
+    MonitoredBuffer& operator=(const __FlashStringHelper *value) {
+        strncpy_P(this->buf, reinterpret_cast<PGM_P>(value), size);
+        this->dirty = true;
+        return *this;
+    }
+
+    operator char*() {
+        return this->buf;
+    }
+
+    char operator[](int i) const {
+        return this->buf[i];
+    }
+
+    char& operator [](int i) {
+        return this->buf[i];
     }
 };
 
