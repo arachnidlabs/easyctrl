@@ -3,8 +3,9 @@
 // Create a monitored int called "interval", with an initial value of 500.
 Monitored<int> interval("interval", 500);
 
-// Create a read-only monitored int called "count"
-Monitored<int> count("count", 0, false);
+// Create a read-only monitored int called "count". Specifying a third argument
+// of NULL indicates the variable is read-only.
+Monitored<int> count("count", 0, NULL);
 
 void setup() {
     // Initialize the serial port

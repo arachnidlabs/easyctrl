@@ -14,6 +14,7 @@ protected:
     MonitoredBase *next;
     bool dirty;
     bool writeable;
+    void (*on_change)(MonitoredBase*);
 
     void describe(Stream &stream) {
         stream.print(F(".field "));
@@ -35,6 +36,8 @@ protected:
     void read(const char *data) {
         this->parse(data);
         this->dirty = false;
+        if(on_change != NULL)
+            on_change(this);
     }
 
     void write(Stream &stream) {
@@ -141,16 +144,23 @@ protected:
     virtual void parse(const char *data);
     virtual void printTypeName(Stream &stream);
 public:
+    Monitored(const char *name, T value, void (*on_change)(Monitored<T>*)) {
+        this->value = value;
+        this->dirty = true;
+        this->on_change = (void (*)(MonitoredBase*))on_change;
+        init(name, on_change != NULL);
+    }
+
     Monitored(const char *name, T value) {
         this->value = value;
         this->dirty = true;
         init(name, true);
     }
 
-    Monitored(const char *name, T value, bool writeable) {
-        this->value = value;
-        this->dirty = true;
-        init(name, writeable);
+    Monitored(const char *name, void (*on_change)(Monitored<T>*)) {
+        this->dirty = false;
+        this->on_change = (void (*)(MonitoredBase*))on_change;
+        init(name, true);
     }
 
     Monitored(const char *name) {
@@ -236,14 +246,15 @@ protected:
     }
 
 public:
+    MonitoredBuffer(const char *name, void (*on_change)(MonitoredBuffer*)) {
+        this->dirty = false;
+        this->on_change = (void (*)(MonitoredBase*))on_change;
+        init(name, on_change != NULL);
+    }
+
     MonitoredBuffer(const char *name) {
         this->dirty = false;
         init(name, true);
-    }
-
-    MonitoredBuffer(const char *name, bool writeable) {
-        this->dirty = false;
-        init(name, writeable);
     }
 
     MonitoredBuffer& operator=(const MonitoredBuffer &value) {
