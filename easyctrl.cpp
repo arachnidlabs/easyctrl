@@ -79,3 +79,26 @@ template<>
 void Monitored<double>::printTypeName(Stream &stream) {
 	stream.print(F("double"));
 }
+
+template<>
+void Monitored<bool>::format(Stream &stream) {
+    if(this->value) {
+        stream.print(F("true"));
+    } else {
+        stream.print(F("false"));
+    }
+}
+
+template<>
+void Monitored<bool>::parse(const char *data) {
+    if(strncasecmp_P(data, PSTR("true"), 4) == 0 || atoi(data) != 0) {
+        this->value = true;
+    } else {
+        this->value = false;
+    }
+}
+
+template<>
+void Monitored<bool>::printTypeName(Stream &stream) {
+    stream.print(F("bool"));
+}
