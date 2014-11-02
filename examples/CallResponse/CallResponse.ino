@@ -1,5 +1,21 @@
 #include "easyctrl.h"
 
+/* CallResponse
+
+This sketch demonstrates a couple of Easyctrl concepts: monitored buffers, and
+change events.
+
+A monitored buffer is a fixed length string whose contents are communicated to
+the controlling device. Unlike primitives, not all changes to a monitored buffer
+can be detected automatically, so you need to call `.changed()` on it to let it
+know when you've modified it.
+
+Change events allow you to take actions when the controlling device modifies
+a monitored variable. In this example, we define an event handler, `on_name_change`,
+which updates the greeting in response to a change to the name.
+
+*/
+
 // Create a monitored buffer called "greeting"
 MonitoredBuffer<40> greeting("greeting");
 
