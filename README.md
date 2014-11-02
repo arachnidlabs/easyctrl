@@ -15,7 +15,9 @@ A monitored variable has changes to its value automatically sent to clients list
 
 Optionally, you can also specify an initial value, and whether or not you want it to be writeable:
 
-    Monitored<int> foo("foo", 42, false);
+    Monitored<int> foo("foo", 42, NULL);
+
+Specifying NULL for the third parameter signifies that the variable should not be writeable.
 
 Once you've declared a monitored variable, you can use it just like you would a regular variable:
 
@@ -44,6 +46,19 @@ MonitoredBuffer also supports a few convenience methods for copying into it:
     buf = another_string; // As above, copies the value in another_string
     buf = F("I'm in progmem!"); // Copies a value out of flash into the buffer
 
+### Change events
+
+Sometimes it's useful to be able to respond when the remote end changes a variable. You can do this by declaring a change event handler. First, define a function that takes a pointer to the monitored variable as its only argument:
+
+    void on_foo_change(Monitored<int> *foo) {
+      bar = *foo * 2;
+    }
+
+Then, declare your monitored variable with the event handler as the third argument:
+
+    Monitored<int> foo("foo", 42, on_foo_change);
+
+Your change handler function will be called whenever the remote end changes the value of the variable. Local changes will not trigger the handler.
 
 ### Initialization & Execution
 
